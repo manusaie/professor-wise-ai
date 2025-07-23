@@ -79,6 +79,9 @@ export type Database = {
           content: string
           conversation_id: string
           created_at: string | null
+          file_size: number | null
+          file_type: string | null
+          file_url: string | null
           id: string
           message_type: string | null
           metadata: Json | null
@@ -89,6 +92,9 @@ export type Database = {
           content: string
           conversation_id: string
           created_at?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           message_type?: string | null
           metadata?: Json | null
@@ -99,6 +105,9 @@ export type Database = {
           content?: string
           conversation_id?: string
           created_at?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           message_type?: string | null
           metadata?: Json | null
