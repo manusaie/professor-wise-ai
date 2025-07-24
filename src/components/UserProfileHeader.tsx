@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -8,7 +8,7 @@ import { User, Star, Coins } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface ProfileData {
-  username: string;
+  display_name: string;
   avatar_url: string;
   level: number;
   xp: number;
@@ -30,7 +30,7 @@ export function UserProfileHeader() {
       setLoading(true);
       const { data, error } = await supabase
         .from('profiles')
-        .select('username, avatar_url, level, xp, coins')
+        .select('display_name, avatar_url, level, xp, coins')
         .eq('id', user.id)
         .single();
 
@@ -78,12 +78,12 @@ export function UserProfileHeader() {
     <div className="space-y-6">
       <div className="flex items-center gap-4 w-full p-4 bg-card rounded-lg border">
           <Avatar className="h-16 w-16 border-2 border-primary">
-              <AvatarImage src={profile.avatar_url} alt={profile.username} />
+              <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
               <AvatarFallback><User className="h-8 w-8"/></AvatarFallback>
           </Avatar>
           <div className="flex-1">
               <div className="flex justify-between items-center mb-2">
-                  <span className="font-bold text-xl text-card-foreground">{profile.username}</span>
+                  <span className="font-bold text-xl text-card-foreground">{profile.display_name}</span>
                   <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1.5 text-amber-500">
                           <Coins className="h-5 w-5" />

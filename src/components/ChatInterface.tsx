@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,6 @@ import { Send, Bot, User, Clock, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from './ui/skeleton';
 import { toast } from './ui/use-toast';
-import { config } from '@/config/env';
 
 interface Message {
   id: string;
@@ -77,7 +76,7 @@ export function ChatInterface({ conversationId: propConversationId }: ChatInterf
           } else {
             const formattedMessages = messagesData.map(msg => ({
               id: msg.id,
-              sender: msg.sender,
+              sender: msg.sender as 'user' | 'ai',
               content: msg.content,
               timestamp: new Date(msg.created_at).toLocaleTimeString('pt-BR', { 
                 hour: '2-digit', 
@@ -117,7 +116,7 @@ export function ChatInterface({ conversationId: propConversationId }: ChatInterf
           if (newMessage.sender === 'ai') {
             setMessages(prevMessages => [...prevMessages, {
               id: newMessage.id,
-              sender: newMessage.sender,
+              sender: newMessage.sender as 'user' | 'ai',
               content: newMessage.content,
               timestamp: new Date(newMessage.created_at).toLocaleTimeString('pt-BR', { 
                 hour: '2-digit', 
@@ -239,7 +238,7 @@ export function ChatInterface({ conversationId: propConversationId }: ChatInterf
 
       // 5. Chama a Edge Function segura (Proxy para o N8N)
       try {
-        const response = await fetch(`${config.supabase.url}/functions/v1/n8n-proxy`, {
+        const response = await fetch(`https://mdlmvizqxtqtzoyxlgif.supabase.co/functions/v1/n8n-proxy`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -304,7 +303,7 @@ export function ChatInterface({ conversationId: propConversationId }: ChatInterf
               <p className="text-sm text-muted-foreground">{t('Your AI Learning Assistant')}</p>
             </div>
             <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
-              {t('Active')}
+              Online
             </Badge>
           </CardHeader>
 

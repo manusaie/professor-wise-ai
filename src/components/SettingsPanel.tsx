@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,9 +26,9 @@ interface SettingsPanelProps {
 }
 
 interface ProfileData {
-  username: string;
+  display_name: string;
   tutor_name: string;
-  tutor_gender: 'male' | 'female';
+  tutor_gender: 'male' | 'female' | 'neutral';
   tutor_avatar_url: string;
 }
 
@@ -43,7 +43,7 @@ export function SettingsPanel({ language, darkMode, onSave }: SettingsPanelProps
   const [currentDarkMode, setCurrentDarkMode] = useState(darkMode);
 
   const [profile, setProfile] = useState<ProfileData>({
-    username: '',
+    display_name: '',
     tutor_name: 'Professor',
     tutor_gender: 'male',
     tutor_avatar_url: '',
@@ -61,7 +61,7 @@ export function SettingsPanel({ language, darkMode, onSave }: SettingsPanelProps
     setLoading(true);
     supabase
       .from('profiles')
-      .select('username, tutor_name, tutor_gender, tutor_avatar_url')
+      .select('display_name, tutor_name, tutor_gender, tutor_avatar_url')
       .eq('id', user.id)
       .single()
       .then(({ data, error }) => {
@@ -69,9 +69,9 @@ export function SettingsPanel({ language, darkMode, onSave }: SettingsPanelProps
           console.error('Error fetching profile', error);
         } else if (data) {
           setProfile({
-            username: data.username || '',
+            display_name: data.display_name || '',
             tutor_name: data.tutor_name || 'Professor',
-            tutor_gender: data.tutor_gender || 'male',
+            tutor_gender: (data.tutor_gender as 'male' | 'female' | 'neutral') || 'male',
             tutor_avatar_url: data.tutor_avatar_url || '',
           });
         }
@@ -84,14 +84,13 @@ export function SettingsPanel({ language, darkMode, onSave }: SettingsPanelProps
     if (!user) return;
     setLoading(true);
     try {
-      const { error } = await supabase.from('profiles').upsert({
-        id: user.id,
-        username: profile.username,
+      const { error } = await supabase.from('profiles').update({
+        display_name: profile.display_name,
         tutor_name: profile.tutor_name,
         tutor_gender: profile.tutor_gender,
         tutor_avatar_url: profile.tutor_avatar_url,
         updated_at: new Date().toISOString(),
-      });
+      }).eq('id', user.id);
 
       if (error) throw error;
       alert(t('Profile updated successfully!')); 
@@ -150,11 +149,11 @@ export function SettingsPanel({ language, darkMode, onSave }: SettingsPanelProps
         <CardContent>
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">{t('Username')}</Label>
+              <Label htmlFor="display_name">{t('Username')}</Label>
               <Input
-                id="username"
-                value={profile.username}
-                onChange={(e) => setProfile(prev => ({ ...prev, username: e.target.value }))}
+                id="display_name"
+                value={profile.display_name}
+                onChange={(e) => setProfile(prev => ({ ...prev, display_name: e.target.value }))}
                 placeholder={t('Your unique username')}
                 disabled={loading}
               />
@@ -173,7 +172,7 @@ export function SettingsPanel({ language, darkMode, onSave }: SettingsPanelProps
               <Label>{t('Tutor Pronoun')}</Label>
               <Select
                 value={profile.tutor_gender}
-                onValueChange={(value) => setProfile(prev => ({ ...prev, tutor_gender: value as 'male' | 'female' }))}
+                onValueChange={(value) => setProfile(prev => ({ ...prev, tutor_gender: value as 'male' | 'female' | 'neutral' }))}
                 disabled={loading}
               >
                 <SelectTrigger>
