@@ -60,6 +60,77 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Integração com N8N (Proxy Seguro) — Supabase Edge Function
+
+Para detalhes sobre a arquitetura e configuração da integração com N8N, consulte o [Guia Completo de Integração com N8N](./N8N_INTEGRATION_GUIDE.md).
+
+## Lembretes (Agenda) — Supabase Edge Function
+
+A funcionalidade de lembretes/agendamento é servida por uma **Supabase Edge Function** RESTful, pronta para produção.
+
+### Endpoint
+
+```
+https://mdlmvizqxtqtzoyxlgif.functions.supabase.co/reminders
+```
+
+### Métodos suportados
+- **GET**: Lista todos os lembretes do usuário autenticado
+- **POST**: Cria um novo lembrete
+- **PUT**: Atualiza um lembrete existente (por `id`)
+- **DELETE**: Remove um lembrete (por `id`)
+
+### Autenticação
+- Todas as requisições exigem o header:
+  ```
+  Authorization: Bearer <jwt_do_usuario>
+  ```
+  O JWT é obtido via Supabase Auth no frontend.
+
+### Exemplos de uso
+
+**Listar lembretes:**
+```http
+GET /reminders
+Authorization: Bearer <jwt>
+```
+
+**Criar lembrete:**
+```http
+POST /reminders
+Authorization: Bearer <jwt>
+Content-Type: application/json
+{
+  "title": "Estudar matemática",
+  "description": "Revisar álgebra",
+  "remind_at": "2025-07-24T10:00:00-03:00",
+  "is_recurring": false,
+  "recurrence_rule": null
+}
+```
+
+**Atualizar lembrete:**
+```http
+PUT /reminders?id=<id_do_lembrete>
+Authorization: Bearer <jwt>
+Content-Type: application/json
+{
+  "title": "Novo título",
+  ...
+}
+```
+
+**Excluir lembrete:**
+```http
+DELETE /reminders?id=<id_do_lembrete>
+Authorization: Bearer <jwt>
+```
+
+### Observações
+- Todos os métodos retornam mensagens de erro internacionalizadas em PT-BR/EN.
+- O frontend deve garantir que o usuário esteja autenticado e envie o JWT nas requisições.
+- O endpoint está protegido por RLS e só retorna/permite alterações aos lembretes do próprio usuário.
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/1bcfb6f3-ffaa-4e30-aabc-94ad0532d225) and click on Share -> Publish.

@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LearningHeader } from "@/components/LearningHeader";
 import { ProgressCards } from "@/components/ProgressCards";
-import { NavigationTabs } from "@/components/NavigationTabs";
+import NavigationTabs from "@/components/NavigationTabs";
 import { ChatInterface } from "@/components/ChatInterface";
+import { SettingsPanel } from "@/components/SettingsPanel";
+import RemindersPanel from "@/components/RemindersPanel";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("chat");
@@ -17,6 +19,19 @@ const Index = () => {
     streak: 0,
     totalXp: 5
   };
+
+  // Persistência e controle de idioma e dark mode
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'pt-BR');
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'true');
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+    localStorage.setItem('darkMode', darkMode.toString());
+  }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+  }, [language]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -43,10 +58,18 @@ const Index = () => {
       case "settings":
         return (
           <div className="px-6">
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold mb-4">Settings</h2>
-              <p className="text-muted-foreground">Customize your learning experience.</p>
-            </div>
+            <SettingsPanel
+              language={language}
+              onLanguageChange={setLanguage}
+              darkMode={darkMode}
+              onDarkModeToggle={() => setDarkMode((prev) => !prev)}
+            />
+          </div>
+        );
+      case "reminders":
+        return (
+          <div className="px-6">
+            <RemindersPanel />
           </div>
         );
       default:
@@ -56,29 +79,33 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <LearningHeader userName={userData.name} />
-      
-      <div className="mb-6">
-        <div className="px-6 py-4">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            🏆 Your Learning Progress
-          </h2>
-        </div>
-        
-        <ProgressCards
-          level={userData.level}
-          xp={userData.xp}
-          maxXp={userData.maxXp}
-          coins={userData.coins}
-          streak={userData.streak}
-          totalXp={userData.totalXp}
-        />
+      <div className="sticky top-0 z-10 bg-card shadow-sm">
+        <LearningHeader userName={userData.name} />
       </div>
-
-      <NavigationTabs activeTab={activeTab} onTabChange={setActiveTab} />
       
-      <div className="pb-6">
-        {renderTabContent()}
+      <div className="container mx-auto px-4 py-6">
+        <div className="mb-6">
+          <div className="px-2 py-4">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              🏆 Seu Progresso de Aprendizado
+            </h2>
+          </div>
+          
+          <ProgressCards
+            level={userData.level}
+            xp={userData.xp}
+            maxXp={userData.maxXp}
+            coins={userData.coins}
+            streak={userData.streak}
+            totalXp={userData.totalXp}
+          />
+        </div>
+
+        <NavigationTabs activeTab={activeTab} onTabChange={setActiveTab} />
+        
+        <div className="pb-6">
+          {renderTabContent()}
+        </div>
       </div>
     </div>
   );

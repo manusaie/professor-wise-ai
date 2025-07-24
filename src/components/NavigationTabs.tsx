@@ -6,7 +6,7 @@ interface NavigationTabsProps {
   onTabChange: (tab: string) => void;
 }
 
-export function NavigationTabs({ activeTab, onTabChange }: NavigationTabsProps) {
+const NavigationTabs = ({ activeTab, onTabChange }: NavigationTabsProps) => {
   return (
     <div className="px-6 mb-6">
       <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
@@ -31,4 +31,6 @@ export function NavigationTabs({ activeTab, onTabChange }: NavigationTabsProps) 
       </Tabs>
     </div>
   );
-}
+};
+
+export default NavigationTabs;
