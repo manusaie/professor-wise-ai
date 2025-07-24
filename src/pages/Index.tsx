@@ -60,9 +60,11 @@ const Index = () => {
           <div className="px-6">
             <SettingsPanel
               language={language}
-              onLanguageChange={setLanguage}
               darkMode={darkMode}
-              onDarkModeToggle={() => setDarkMode((prev) => !prev)}
+              onSave={(settings) => {
+                setLanguage(settings.language);
+                setDarkMode(settings.darkMode);
+              }}
             />
           </div>
         );
@@ -80,7 +82,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-10 bg-card shadow-sm">
-        <LearningHeader userName={userData.name} />
+        <LearningHeader 
+          userName={userData.name} 
+          onSettingsClick={() => setActiveTab("settings")} 
+        />
       </div>
       
       <div className="container mx-auto px-4 py-6">

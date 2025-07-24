@@ -6,5 +6,11 @@ import { useAuth } from '@/contexts/AuthContext';
  */
 export const useSession = () => {
   const { session } = useAuth();
-  return { session };
+  
+  const getToken = async () => {
+    if (!session) return null;
+    return session.access_token;
+  };
+  
+  return { session, getToken };
 };
