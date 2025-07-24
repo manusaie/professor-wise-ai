@@ -47,6 +47,36 @@ export type Database = {
         }
         Relationships: []
       }
+      achievements: {
+        Row: {
+          criteria: Json
+          description: string
+          icon_url: string | null
+          id: string
+          name: string
+          requirement_type: string
+          requirement_value: number
+        }
+        Insert: {
+          criteria: Json
+          description: string
+          icon_url?: string | null
+          id?: string
+          name: string
+          requirement_type?: string
+          requirement_value?: number
+        }
+        Update: {
+          criteria?: Json
+          description?: string
+          icon_url?: string | null
+          id?: string
+          name?: string
+          requirement_type?: string
+          requirement_value?: number
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string | null
@@ -126,12 +156,14 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           coins: number | null
           created_at: string | null
           current_level: number | null
           display_name: string | null
           id: string
           last_activity_date: string | null
+          level: number
           streak_days: number | null
           total_xp: number | null
           tutor_avatar_url: string | null
@@ -139,14 +171,17 @@ export type Database = {
           tutor_name: string | null
           updated_at: string | null
           user_id: string
+          xp: number
         }
         Insert: {
+          avatar_url?: string | null
           coins?: number | null
           created_at?: string | null
           current_level?: number | null
           display_name?: string | null
           id?: string
           last_activity_date?: string | null
+          level?: number
           streak_days?: number | null
           total_xp?: number | null
           tutor_avatar_url?: string | null
@@ -154,14 +189,17 @@ export type Database = {
           tutor_name?: string | null
           updated_at?: string | null
           user_id: string
+          xp?: number
         }
         Update: {
+          avatar_url?: string | null
           coins?: number | null
           created_at?: string | null
           current_level?: number | null
           display_name?: string | null
           id?: string
           last_activity_date?: string | null
+          level?: number
           streak_days?: number | null
           total_xp?: number | null
           tutor_avatar_url?: string | null
@@ -169,8 +207,53 @@ export type Database = {
           tutor_name?: string | null
           updated_at?: string | null
           user_id?: string
+          xp?: number
         }
         Relationships: []
+      }
+      reminders: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_recurring: boolean | null
+          recurrence_rule: string | null
+          remind_at: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          recurrence_rule?: string | null
+          remind_at: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          recurrence_rule?: string | null
+          remind_at?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       study_reminders: {
         Row: {
@@ -284,6 +367,25 @@ export type Database = {
       calculate_level: {
         Args: { xp: number }
         Returns: number
+      }
+      check_and_grant_achievements: {
+        Args: { user_id_in: string }
+        Returns: {
+          unlocked_achievement_name: string
+          unlocked_achievement_description: string
+        }[]
+      }
+      increment_user_stats: {
+        Args: {
+          user_id_in: string
+          xp_increment?: number
+          coins_increment?: number
+        }
+        Returns: undefined
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
     }
     Enums: {
